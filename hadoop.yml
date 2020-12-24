@@ -1,0 +1,86 @@
+- hosts: Master
+  tasks:
+  - name: Copying jdk setup file to master node
+    copy:
+     src: "jdk-8u171-linux-x64.rpm"
+     dest: "/root"
+
+  - name: Copying hadoop setup file to master node
+    copy:
+     src: "hadoop-1.2.1-1.x86_64.rpm" 
+     dest: "/root"
+
+  - name: Installing JDK Master-Node
+    command: "rpm -iv jdk-8u171-linux-x64.rpm --force"
+    ignore_errors: True
+  
+  - name: Installing Hadoop in Master-Node  
+    command: "rpm -iv hadoop-1.2.1-1.x86_64.rpm --force"
+    ignore_errors: True
+  
+  - name: Creating Name-Node Directory 
+    file:
+     state: directory
+     path: "/nn" 
+
+  - name: Configuring hdfs-site.xml in Master node 
+    copy:
+     src: "/root/ws2/master/hdfs-site.xml"
+     dest: "/etc/hadoop/hdfs-site.xml"
+  
+  - name: Configuring core-site.xml in Master Node
+    copy: 
+     src: "/root/ws2/master/core-site.xml"
+     dest: "/etc/hadoop/core-site.xml"
+
+  - name: Formatting Name-Node
+    command: "hadoop namenode -format -force"
+
+  - name: Starting Name-Node
+    command: "hadoop-daemon.sh start namenode"
+
+  - name: Setting-up Connection for Slave-Node
+    command: "systemctl stop firewalld"
+
+- hosts: Slave
+  tasks:
+  - name: Copying jdk setup file to slave node
+    copy:
+     src: "jdk-8u171-linux-x64.rpm"
+     dest: "/root"
+
+  - name: Copying jdk setup file to slave node
+    copy:
+     src: "hadoop-1.2.1-1.x86_64.rpm" 
+     dest: "/root"
+
+  - name: Installing JDK in Slave-Node  
+    command: "rpm -iv jdk-8u171-linux-x64.rpm --force"
+    ignore_errors: True
+  
+  - name: Installing Hadoop in Slave-Node   
+    command: "rpm -iv hadoop-1.2.1-1.x86_64.rpm --force"
+    ignore_errors: True
+  
+  - name: Creating Data-Node Directory   
+    file:
+     state: directory
+     path: "/dn" 
+
+  - name: Configuring hdfs-site.xml 
+    copy:
+     src: "hdfs-site.xml"
+     dest: "/etc/hadoop/hdfs-site.xml"
+  
+  - name: Configuring core-site.xml 
+    copy: 
+     src: "core-site.xml"
+     dest: "/etc/hadoop/core-site.xml"
+
+  - name: Starting Data-Node
+    command: "hadoop-daemon.sh start datanode"
+
+  
+     
+     
+ 
